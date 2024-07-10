@@ -38,13 +38,13 @@ internal class StartUp
 
                 bool isNewHighScore = false;
 
-                if (highScores.Count < 10 || hitsPerSecond > highScores[^1])
+                if (highScores.Count < 3 || hitsPerSecond > highScores[^1])
                 {
                     highScores.Add(hitsPerSecond); // Adds new high score to the list
                     highScores.Sort((a, b) => b.CompareTo(a)); // Sorts high scores in descending order
 
-                    // Checks if saved high scores are more than 10
-                    if (highScores.Count > 10)
+                    // Checks if saved high scores are more than 3
+                    if (highScores.Count > 3)
                     {
                         highScores.RemoveAt(highScores.Count - 1); // Removes the lowest high score 
                     }
