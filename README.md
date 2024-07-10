@@ -2,7 +2,7 @@
 
 ## Description
 
-"Osu Speed Test" is a console application designed for Osu! players to measure and track their clicking speed and performance metrics.
+"Osu! Speed Test" is a console application designed for Osu! players and anyone interested in measuring and tracking their clicking speed and performance metrics.
 
 ## Features
 
