@@ -38,7 +38,7 @@ If you are concerned about the SmartScreen warning, you have the option to compi
 
 ## Troubleshooting
 
-If you encounter issues with running "Osu Speed Test" and the application doesn't start, it may be due to missing dependencies. Here’s how you can resolve this:
+If you encounter issues with running "Osu! Speed Test" and the application doesn't start, it may be due to missing dependencies. Here’s how you can resolve this:
 
 1. **Check .NET Runtime Version**:
    - Open your terminal or command prompt.
