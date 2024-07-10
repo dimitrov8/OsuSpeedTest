@@ -4,6 +4,11 @@
 
 "Osu! Speed Test" is a console application designed for Osu! players and anyone interested in measuring and tracking their clicking speed and performance metrics.
 
+## Screenshots
+![Screenshot 1](screenshots/screenshot1.png)
+
+![Screenshot 2](screenshots/screenshot2.png)
+
 ## Features
 
 - **Speed Test:** Measure your hits per second (HPS) in a simulated test environment. Track how fast you can click within a given time frame.
