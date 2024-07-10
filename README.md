@@ -26,7 +26,7 @@ If you prefer to compile the application from the source code:
 
 ## SmartScreen Warning
 
-When running "Osu! Speed Test" on Windows, you may encounter a SmartScreen warning indicating that the application is unrecognized. This is because SmartScreen does not have enough data about the application's reputation yet. You can click on <ins>More Info<ins> and then choose the **Run anyway** option.
+When running "Osu! Speed Test" on Windows, you may encounter a SmartScreen warning indicating that the application is unrecognized. This is because SmartScreen does not have enough data about the application's reputation yet. You can click on <ins>More Info</ins> and then choose the **Run anyway** option.
 
 If you are concerned about the SmartScreen warning, you have the option to compile the application from the source code yourself. This way, you can verify the integrity of the code before running it.
 
