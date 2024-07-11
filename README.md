@@ -38,6 +38,6 @@ If you are concerned about the SmartScreen warning, you have the option to compi
 2. Follow the on-screen instructions to perform a speed test.
 3. View high scores and receive feedback based on your performance.
 
-**Having Issues?**:
+## Having Issues?
 
 Feel free to [open an issue](https://github.com/dimitrov8/OsuSpeedTest/issues) on GitHub if you run into any problems with "Osu! Speed Test." Please include details and any error messages.
