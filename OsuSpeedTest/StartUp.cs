@@ -18,52 +18,25 @@ internal class StartUp
         {
             try
             {
-                Console.Clear(); // Clears the console screen 
-                Console.WriteLine("Osu! Speed Test");
-                Console.WriteLine("GitHub profile: https://github.com/dimitrov8");
+                int totalHits = await GetValidNumberOfHitsAsync(highScoreManager, highScores); // Asks user for number of hits to test
+                double timeTaken = await hitTester.TestHitsAsync(totalHits); // Tests the hit speed and measures time taken
+                double hitsPerSecond = totalHits / timeTaken; // Calculates hits per second
 
-                highScoreManager.DisplayHighScores(highScores); // Displays the current high scores
+                feedbackProvider.DisplayTestResults(totalHits, timeTaken, hitsPerSecond); // Display test results
 
-                int numHits = await hitTester.GetNumberOfHitsAsync(); // Asks user for number of hits to test
+                bool isNewHighScore = highScoreManager.UpdateHighScores(highScores, hitsPerSecond); // Update high scores
 
-                double timeTaken = await hitTester.TestHitsAsync(numHits); // Tests the hit speed and measures time taken
-                double hitsPerSecond = numHits / timeTaken; // Calculates hits per second
-
-                Console.ForegroundColor = ConsoleColor.DarkGray; // Set the color of the test result
-                Console.WriteLine($"Your {numHits} hits have been completed in {timeTaken:F2} seconds."); // Displays test results
-                Console.WriteLine($"Average hit speed: {hitsPerSecond:F2} hits per second."); // Displays average hit speed
-
-                string feedback = feedbackProvider.GiveFeedback(hitsPerSecond, numHits); // Generates feedback based on performance
-                Console.WriteLine($"Feedback: {feedback}"); // Displays feedback to the user
-
-                bool isNewHighScore = false;
-
-                if (highScores.Count < 3 || hitsPerSecond > highScores[^1])
-                {
-                    highScores.Add(hitsPerSecond); // Adds new high score to the list
-                    highScores.Sort((a, b) => b.CompareTo(a)); // Sorts high scores in descending order
-
-                    // Checks if saved high scores are more than 3
-                    if (highScores.Count > 3)
-                    {
-                        highScores.RemoveAt(highScores.Count - 1); // Removes the lowest high score 
-                    }
-
-                    await highScoreManager.SaveHighScoresAsync(highScores); // Saves updated high scores to storage
-                    isNewHighScore = true;
-                }
-
-                // Output message with color based on whether it's a new high score or not
+                // Notify user if it's a new high score
                 if (isNewHighScore)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("New high score!");
                 }
 
-                Console.ResetColor(); // Reset color to default
+                Console.ResetColor();
 
-                Console.WriteLine("Press Enter to try again or type 'exit' to quit."); // Prompt for user input
-                string input = Console.ReadLine(); // Reads user input
+                Console.WriteLine("Press Enter to try again or type 'exit' to quit."); // Read user input
+                string? input = Console.ReadLine(); // Reads user input
 
                 // Checks if user wants to exit the application
                 if (input?.ToLower() == "exit")
@@ -77,6 +50,40 @@ internal class StartUp
                 Console.WriteLine("Press Enter to continue...");
                 Console.ReadLine();
             }
+        }
+    }
+
+    /// <summary>
+    ///     Asynchronously prompts the user to enter a valid number of hits within a specified range.
+    /// </summary>
+    /// <param name="highScoreManager">The instance of the high score manager.</param>
+    /// <param name="highScores">The list of high scores to display.</param>
+    /// <returns>The valid number of hits entered by the user.</returns>
+    private static async Task<int> GetValidNumberOfHitsAsync(HighScoreManager highScoreManager, List<double> highScores)
+    {
+        while (true)
+        {
+            Console.Clear();
+            highScoreManager.DisplayHighScores(highScores); // Display current high scores
+            Console.WriteLine(); // Blank line for spacing
+            Console.Write($"Enter the number of hits (between {HitTester.MIN_HITS} and {HitTester.MAX_HITS}): ");
+            string? input = await Task.Run(Console.ReadLine); // // Read user input asynchronously
+
+            // Checks if the input can be parsed to an integer and if it falls within the valid range
+            if (int.TryParse(input, out int totalHits) &&
+                totalHits is >= HitTester.MIN_HITS and <= HitTester.MAX_HITS)
+            {
+                return totalHits; // Returns the valid number of hits
+            }
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Please enter a valid number between {HitTester.MIN_HITS} and {HitTester.MAX_HITS}.");
+            Console.ResetColor();
+
+            // Prompt user to retry
+            Console.WriteLine();
+            Console.WriteLine("Press Enter to try again...");
+            await Task.Run(Console.ReadLine);
         }
     }
 }

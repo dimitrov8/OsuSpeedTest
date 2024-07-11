@@ -7,6 +7,7 @@
 public class HighScoreManager
 {
     private const string HIGH_SCORE_FILE_NAME = "OsuSpeedTest_HighScores.txt";
+    private const string SEPARATOR_LINE = "---------------------------------------------";
 
     /// <summary>
     ///     Loads the high scores from a file asynchronously.
@@ -64,6 +65,11 @@ public class HighScoreManager
     /// <param name="highScores">The list of high scores to display.</param>
     public void DisplayHighScores(List<double> highScores)
     {
+        Console.Clear();
+        Console.WriteLine(SEPARATOR_LINE);
+        Console.WriteLine(); // Blank line for spacing
+        Console.WriteLine("Osu! Speed Test");
+        Console.WriteLine("GitHub profile: https://github.com/dimitrov8");
         Console.WriteLine("High scores:");
 
         for (int i = 0; i < highScores.Count; i++)
@@ -71,6 +77,35 @@ public class HighScoreManager
             Console.WriteLine($"{i + 1}. {highScores[i]:F2} hits per second"); // Displays each high score
         }
 
-        Console.WriteLine();
+        Console.WriteLine(); // Blank line for spacing
+        Console.WriteLine(SEPARATOR_LINE);
+    }
+
+    /// <summary>
+    ///     Updates the list of high scores if the new score qualifies as a high score.
+    /// </summary>
+    /// <param name="highScores">The list of current high scores.</param>
+    /// <param name="newScore">The new score to be evaluated.</param>
+    /// <returns>True if the new score is a high score and the list is updated; otherwise, false.</returns>
+    public bool UpdateHighScores(List<double> highScores, double newScore)
+    {
+        bool isNewHighScore = false;
+
+        if (highScores.Count < 3 || newScore > highScores[^1])
+        {
+            highScores.Add(newScore); // Adds new high score to the list
+            highScores.Sort((a, b) => b.CompareTo(a)); // Sorts high scores in descending order
+
+            // Removes the lowest high score if more than 3 scores are saved
+            if (highScores.Count > 3)
+            {
+                highScores.RemoveAt(highScores.Count - 1);
+            }
+
+            _ = this.SaveHighScoresAsync(highScores); // Save asynchronously without awaiting
+            isNewHighScore = true;
+        }
+
+        return isNewHighScore;
     }
 }

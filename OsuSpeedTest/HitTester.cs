@@ -10,51 +10,21 @@ using WindowsInput.Native;
 /// </summary>
 public class HitTester
 {
+    internal const int MIN_HITS = 20; // Minimum number of hits allowed
+    internal const int MAX_HITS = 1000; // Maximum number of hits allowed
     private static int counter; // Counts the number of key presses
     private static bool running = true; // Indicates if the hit test is running
     private static VirtualKeyCode? registeredKeyCode; // The key registered for counting hits
-    private const int MIN_HITS = 20; // Minimum number of hits allowed
-    private const int MAX_HITS = 1000; // Maximum number of hits allowed
     private static readonly InputSimulator Simulator = new(); // Simulates input for checking key states
     private static bool keyWasReleased = true; // Tracks if key was released
-
-    /// <summary>
-    ///     Prompts the user to enter the number of hits for the test.
-    ///     Ensures the entered number is within the valid range.
-    /// </summary>
-    /// <returns>The number of hits for the test.</returns>
-    public async Task<int> GetNumberOfHitsAsync()
-    {
-        while (true) // Continuously prompt unit a valid input is received
-        {
-            try
-            {
-                Console.WriteLine($"Enter the number of hits (between {MIN_HITS} and {MAX_HITS}): ");
-                string? input = await Task.Run(Console.ReadLine); // Reads input asynchronously
-
-                // Checks if the input can be parsed to an integer and if it falls within the valid range
-                if (int.TryParse(input, out int numHits) &&
-                    numHits is >= MIN_HITS and <= MAX_HITS)
-                {
-                    return numHits; // Returns the valid number of hits
-                }
-
-                Console.WriteLine($"Please enter a valid number between {MIN_HITS} and {MAX_HITS}.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading input: {ex.Message}");
-            }
-        }
-    }
 
     /// <summary>
     ///     Tests the user's hitting speed by counting key presses.
     ///     Measures the time taken to complete the specified number of hits.
     /// </summary>
-    /// <param name="numHits">The number of hits to count.</param>
+    /// <param name="totalHits">The number of hits to count.</param>
     /// <returns>The time taken to complete the hits.</returns>
-    public async Task<double> TestHitsAsync(int numHits)
+    public async Task<double> TestHitsAsync(int totalHits)
     {
         try
         {
@@ -70,8 +40,7 @@ public class HitTester
             await ResetKeyState(); // Ensures the registered key is in a released state
 
             var stopwatch = new Stopwatch(); // Initializes the stopwatch
-
-            var countTask = CountKeyPressesAsync(numHits, stopwatch); // Starts counting key presses
+            var countTask = CountKeyPressesAsync(totalHits, stopwatch); // Starts counting key presses
             await countTask; // Waits for the counting task to be complete
 
             ClearInputBuffer(); // Clear any residual key presses
@@ -99,11 +68,13 @@ public class HitTester
     /// <summary>
     ///     Counts the number of key presses and measures the time taken.
     /// </summary>
-    /// <param name="numHits">The number of hits to count.</param>
+    /// <param name="totalHits">The number of hits to count.</param>
     /// <param name="stopwatch">The stopwatch to measure time.</param>
-    private static async Task CountKeyPressesAsync(int numHits, Stopwatch stopwatch)
+    private static async Task CountKeyPressesAsync(int totalHits, Stopwatch stopwatch)
     {
         bool firstPressDetected = false; // Tracks if the first key press was detected
+
+        Console.Write("Hits: 0"); // Initial display
 
         while (running) // Continuously counts key presses while the hit test is running
         {
@@ -122,7 +93,10 @@ public class HitTester
                 {
                     counter++; // Increments the counter for each key press
                     keyWasReleased = false; // Resets the key release flag
-                    Console.WriteLine($"Hits: {counter}");
+
+
+                    Console.SetCursorPosition(6, Console.CursorTop); // Update the hit count on the same line
+                    Console.Write(counter.ToString().PadRight(4)); // Pad to ensure overwriting
 
                     // Starts the stopwatch on the first key press
                     if (firstPressDetected == false)
@@ -133,7 +107,7 @@ public class HitTester
                 }
 
                 // Checks if the required number of hits is reached
-                if (counter >= numHits)
+                if (counter >= totalHits)
                 {
                     running = false; // Stops the counting when the required number of hits is reached
                     stopwatch.Stop(); // Stops the stopwatch
@@ -147,6 +121,8 @@ public class HitTester
                 running = false;
             }
         }
+
+        Console.WriteLine(); // Move to the next line after the test is complete
     }
 
     /// <summary>

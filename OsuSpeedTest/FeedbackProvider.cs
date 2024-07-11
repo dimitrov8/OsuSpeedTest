@@ -1,22 +1,29 @@
 ﻿namespace OsuSpeedTest;
 
 /// <summary>
-///     Provides feedback based on the user's performance with color coding.
+///     Provides feedback based on test results for the Osu! Speed Test application.
 /// </summary>
 public class FeedbackProvider
 {
     /// <summary>
-    ///     Gives feedback based on hits per second and total hits.
+    ///     Displays the test results including hits completed, time taken, average hit speed, and feedback.
     /// </summary>
-    /// <param name="hitsPerSecond">The average hits per second.</param>
-    /// <param name="totalHits">The total number of hits.</param>
-    /// <returns>A colored feedback string.</returns>
-    public string GiveFeedback(double hitsPerSecond, int totalHits)
+    /// <param name="totalHits">Total number of hits completed.</param>
+    /// <param name="timeTaken">Time taken to complete the hits in seconds.</param>
+    /// <param name="hitsPerSecond">Average hit speed in hits per second.</param>
+    public void DisplayTestResults(int totalHits, double timeTaken, double hitsPerSecond)
     {
         double performanceRatio = this.CalculatePerformanceRatio(hitsPerSecond, totalHits);
-        string feedback = this.GenerateFeedback(performanceRatio);
+        string feedback = this.GetFeedbackMessage(performanceRatio);
 
-        return feedback;
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine($"Your {totalHits} hits have been completed in {timeTaken:F2} seconds.");
+        Console.WriteLine($"Average hit speed: {hitsPerSecond:F2} hits per second.");
+
+        Console.ForegroundColor = this.GetFeedbackColor(performanceRatio);
+        Console.WriteLine($"Feedback: {feedback}");
+
+        Console.ResetColor();
     }
 
     /// <summary>
@@ -33,35 +40,43 @@ public class FeedbackProvider
     }
 
     /// <summary>
-    ///     Generates feedback message based on performance ratio.
+    ///     Gets the feedback message based on the performance ratio.
     /// </summary>
     /// <param name="performanceRatio">The calculated performance ratio.</param>
-    /// <returns>A colored feedback message.</returns>
-    private string GenerateFeedback(double performanceRatio)
+    /// <returns>The feedback message.</returns>
+    private string GetFeedbackMessage(double performanceRatio)
     {
-        string feedback;
-
         if (performanceRatio < 0.5)
         {
-            feedback = "Keep practicing to improve your speed.";
-            Console.ForegroundColor = ConsoleColor.Red;
-        }
-        else if (performanceRatio < 0.75)
-        {
-            feedback = "Good effort, you're making progress.";
-            Console.ForegroundColor = ConsoleColor.Yellow;
-        }
-        else if (performanceRatio < 1.0)
-        {
-            feedback = "Very good speed, keep it up!";
-            Console.ForegroundColor = ConsoleColor.Green;
-        }
-        else
-        {
-            feedback = "Excellent performance, outstanding speed!";
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            return "Keep practicing to improve your speed.";
         }
 
-        return feedback;
+        if (performanceRatio < 0.75)
+        {
+            return "Good effort, you're making progress.";
+        }
+
+        if (performanceRatio < 1.0)
+        {
+            return "Very good speed, keep it up!";
+        }
+
+        return "Excellent performance, outstanding speed!";
+    }
+
+    /// <summary>
+    ///     Gets the console color based on the performance ratio for feedback display.
+    /// </summary>
+    /// <param name="performanceRatio">The calculated performance ratio.</param>
+    /// <returns>The console color.</returns>
+    private ConsoleColor GetFeedbackColor(double performanceRatio)
+    {
+        return performanceRatio switch
+        {
+            < 0.5 => ConsoleColor.Red,
+            < 0.75 => ConsoleColor.Yellow,
+            < 1.0 => ConsoleColor.Green,
+            _ => ConsoleColor.DarkGreen
+        };
     }
 }
